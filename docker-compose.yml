@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  hlds-monitor:
+    build: .
+    ports:
+      - '27014:27014'
