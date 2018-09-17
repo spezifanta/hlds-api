@@ -18,7 +18,7 @@ cache = SimpleCache()
 
 # Inject server by using environment variables.
 server = os.getenv('server', 'steamcalculator.com')
-port = os.getenv('port', 27015)
+port = int(os.getenv('port', 27015))
 
 @app.route('/')
 def info():

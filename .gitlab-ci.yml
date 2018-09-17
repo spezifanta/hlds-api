@@ -30,15 +30,16 @@ Test Image:
     - apk add --no-cache curl
     - sleep 15
     - docker ps
-    - curl 0.0.0.0:27014/ping
+    - ip a
+    #- curl 0.0.0.0:27014/ping
 
-      #Docker.com:
-      #  stage: publish
-      #  script:
-      #    - docker pull "$CI_REGISTRY_IMAGE"
-      #    - docker tag "$CI_REGISTRY_IMAGE" "spezifanta/hldm"
-      #    - docker login -u "$DOCKER_HUB_USER" -p "$DOCKER_HUB_PASSWORD"
-      #    - docker push "spezifanta/hldm"
+Docker.com:
+  stage: publish
+  script:
+    - docker pull "$CI_REGISTRY_IMAGE"
+    - docker tag "$CI_REGISTRY_IMAGE" "spezifanta/source-monitor"
+    - docker login -u "$DOCKER_HUB_USER" -p "$DOCKER_HUB_PASSWORD"
+    - docker push "spezifanta/source-monitor"
       #
       #GitHub.com:
       #  stage: publish
