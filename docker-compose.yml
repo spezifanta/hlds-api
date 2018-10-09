@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  hlds-monitor:
+  hlds-api:
     build: .
     ports:
       - '27014:27014'
