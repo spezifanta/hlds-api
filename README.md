@@ -1,7 +1,19 @@
 # HLDS API
 
-This Project uses [SourceWatch](https://github.com/spezifanta/SourceWatch) and 
-Flask to create a REST API.
+This Project uses [SourceWatch](https://github.com/spezifanta/SourceWatch) and
+Flask to create a query REST API for Half-Life Dedicated Servers.
+
+## Usage
+
+Set `HLDS_IP` and `HLDS_PORT` to the gameserver you would like not montior.
+
+```bash
+export HLDS_IP="steamcalculator.com"
+export HLDS_PORT="27015"
+python app.py
+```
+
+This will create webserver on port `27014`.
 
 ## Endpoints
 
@@ -12,7 +24,7 @@ Request basic server information, current players and game rules.
 #### Request
 
 ```
-curl steamcalculator.com:27017
+curl localhost:27014
 ```
 
 #### Response
@@ -46,7 +58,7 @@ curl steamcalculator.com:27017
       "play_time": 814.7973022460938
     },
     {
-      "id": 0,
+      "id": 1,
       "kills": 14,
       "name": "muhittin",
       "play_time": 462.9696044921875
@@ -119,7 +131,7 @@ Used as healthcheck for Docker.
 #### Request
 
 ```
-curl steamcalculator.com:27014/ping
+curl localhost:27014/ping
 ```
 
 #### Response
@@ -127,4 +139,3 @@ curl steamcalculator.com:27014/ping
 ```
 pong
 ```
-

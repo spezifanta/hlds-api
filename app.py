@@ -17,8 +17,8 @@ app.config.update(
 cache = SimpleCache()
 
 # Inject server by using environment variables.
-server = os.getenv('server', 'steamcalculator.com')
-port = int(os.getenv('port', 27015))
+server = os.getenv('HLDS_IP', 'steamcalculator.com')
+port = int(os.getenv('HLDS_PORT', 27015))
 
 @app.route('/')
 def info():
@@ -28,7 +28,7 @@ def info():
         result = query.info()
         result = {**result, **query.rules()}
         result = {**result, **query.players()}
-        cache.set('status', result, 60)
+        cache.set('status', result, 10)
     return jsonify(result)
 
 @app.route('/ping')
