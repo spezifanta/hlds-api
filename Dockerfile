@@ -1,13 +1,16 @@
-FROM python:3.7-alpine3.8
+FROM python:3.13-alpine
+
+ENV HLDS_ADDRESS=0.0.0.0
+ENV HLDS_PORT=27000
 
 RUN apk add --no-cache curl
 
 WORKDIR /app
 COPY . .
-RUN pip install -r requirements.txt
+RUN pip install uv && uv sync
 
-EXPOSE 27014
+EXPOSE ${HLDS_PORT}
 
-ENTRYPOINT ["python", "app.py"]
+HEALTHCHECK --interval=1m --timeout=3s CMD curl -f http://localhost:${HLDS_PORT}/ping || exit 1
 
-HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost:27014/ping || exit 1
+ENTRYPOINT ["sh", "-c", "uv run gunicorn --bind ${HLDS_ADDRESS}:${HLDS_PORT} app:app"]

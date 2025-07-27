@@ -1,35 +1,29 @@
 # HLDS API
 
-This Project uses [SourceWatch](https://github.com/spezifanta/SourceWatch) and
-Flask to create a query REST API for Half-Life Dedicated Servers.
+A simple Flask API for querying Half-Life Dedicated Server (HLDS) information using Python 3.13 and uv. Built with [SourceWatch](https://github.com/spezifanta/SourceWatch) and Flask to create a REST API for Half-Life Dedicated Servers.
 
-## Usage
+## Features
 
-Set `HLDS_IP` and `HLDS_PORT` to the gameserver you would like not montior.
+- Query HLDS server info, rules, and players via HTTP API
+- Built-in caching (10-second TTL)
+- Docker support with Gunicorn
 
+## API Endpoints
+
+### `GET /`
+Get server information, rules, and players.
+
+**Query Parameters:**
+- `server` - Server IP/hostname (default: env HLDS_DEFAULT_QUERY_SERVER or steamcalculator.com)
+- `port` - Server port (default: env HLDS_DEFAULT_QUERY_PORT or 27015)
+
+**Example:**
 ```bash
-export HLDS_IP="steamcalculator.com"
-export HLDS_PORT="27015"
-python app.py
+curl "http://localhost:27000/?server=steamcalculator.com&port=27015"
 ```
 
-This will create webserver on port `27014`.
-
-## Endpoints
-
-### `/`
-
-Request basic server information, current players and game rules.
-
-#### Request
-
-```
-curl localhost:27014
-```
-
-#### Response
-
-```
+**Response:**
+```json
 {
   "info": {
     "game_app_id": 70,
@@ -54,13 +48,13 @@ curl localhost:27014
     {
       "id": 0,
       "kills": 4,
-      "name": "On error resume next",
+      "name": "spezi|Fanta",
       "play_time": 814.7973022460938
     },
     {
       "id": 1,
       "kills": 14,
-      "name": "muhittin",
+      "name": "spezi|Cola",
       "play_time": 462.9696044921875
     }
   ],
@@ -68,20 +62,6 @@ curl localhost:27014
     "allow_spectators": "0.0",
     "coop": "0",
     "deathmatch": "1",
-    "decalfrequency": "30",
-    "edgefriction": "2",
-    "max_queries_sec": "1",
-    "max_queries_sec_global": "1",
-    "max_queries_window": "1",
-    "metamod_version": "1.21p38",
-    "mp_allowmonsters": "0",
-    "mp_autocrosshair": "0",
-    "mp_chattime": "10",
-    "mp_consistency": "1",
-    "mp_falldamage": "0",
-    "mp_flashlight": "0",
-    "mp_footsteps": "1",
-    "mp_forcerespawn": "1",
     "mp_fraglimit": "0",
     "mp_fragsleft": "0",
     "mp_friendlyfire": "0",
@@ -103,18 +83,7 @@ curl localhost:27014
     "sv_contact": "steamcalculator.com",
     "sv_friction": "4",
     "sv_gravity": "800",
-    "sv_logblocks": "0",
-    "sv_maxrate": "100000",
-    "sv_maxspeed": "320",
-    "sv_minrate": "5000",
-    "sv_password": "0",
-    "sv_proxies": "0",
-    "sv_stepsize": "18",
-    "sv_stopspeed": "100",
-    "sv_uploadmax": "0.5",
-    "sv_voiceenable": "1",
-    "sv_wateraccelerate": "10",
-    "sv_waterfriction": "1"
+    "sv_maxspeed": "320"
   },
   "server": {
     "ip": "94.130.15.22",
@@ -124,18 +93,75 @@ curl localhost:27014
 }
 ```
 
-### `/ping`
+### `GET /ping`
+Health check endpoint.
 
-Used as healthcheck for Docker.
+**Response:** `pong`
 
-#### Request
+## Development
 
+### Requirements
+- Python 3.13+
+- uv package manager
+
+### Setup
+```bash
+# Clone repository
+git clone https://github.com/spezifanta/hlds-api
+cd hlds-api
+
+# Install dependencies
+uv sync
+
+# Run development server
+uv run python app.py
 ```
-curl localhost:27014/ping
+
+The server will start on `http://localhost:27000`
+
+## Docker
+
+### Build and run locally
+```bash
+docker build -t hlds-api .
+docker run -p 27000:27000 hlds-api
 ```
 
-#### Response
-
+### Using docker-compose
+```bash
+docker-compose up
 ```
-pong
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `HLDS_DEFAULT_QUERY_SERVER` | Default server IP or hostname to query  | `steamcalculator.com` |
+| `HLDS_DEFAULT_QUERY_PORT` | Default server port to query | `27015` |
+| `HLDS_ADDRESS` | Bind address for web server | `127.0.0.1` |
+| `HLDS_PORT` | Bind port for web server | `27000` |
+
+## Deployment
+
+The project includes GitHub Actions workflow that:
+- Tests the application
+- Builds multi-platform Docker images (amd64/arm64)
+- Pushes to GitHub Container Registry (ghcr.io)
+- Runs on pushes to master/main branch
+
+### Using published image
+```bash
+docker run -p 27000:27000 ghcr.io/spezifanta/hlds-api:latest
+```
+
+## Error Handling
+
+The API returns JSON error responses with 400 status code for:
+- Invalid port parameters
+- Network timeouts
+- SourceWatch query failures
+
+Example error response:
+```json
+{"error": "timed out"}
 ```

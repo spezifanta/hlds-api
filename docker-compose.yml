@@ -4,4 +4,4 @@ services:
   hlds-api:
     build: .
     ports:
-      - '27014:27014'
+      - '27000:27000'
